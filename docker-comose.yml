@@ -1,0 +1,56 @@
+
+services:
+  mongodb:
+    image: mongo:8
+    container_name: trustgrid-mongodb
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+
+  certificate-service:
+    build: ./certificate-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+
+  verification-service:
+    build: ./verification-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongodb
+
+  revocation-service:
+    build: ./revocation-service
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongodb
+
+  audit-service:
+    build: ./audit-service
+    ports:
+      - "3005:3005"
+    depends_on:
+      - mongodb
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - certificate-service
+      - verification-service
+      - revocation-service
+      - audit-service
+
+volumes:
+  mongo-data:

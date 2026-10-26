@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: certificate-service
+  namespace: trustgrid
+  labels:
+    app: certificate-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: certificate-service
+  template:
+    metadata:
+      labels:
+        app: certificate-service
+    spec:
+      containers:
+        - name: certificate-service
+          image: trustgrid-certificate-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: trustgrid-config
+                  key: MONGO_URI
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3002
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3002
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: certificate-service
+  namespace: trustgrid
+  labels:
+    app: certificate-service
+spec:
+  type: ClusterIP
+  selector:
+    app: certificate-service
+  ports:
+    - port: 3002
+      targetPort: 3002
