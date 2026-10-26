@@ -64,6 +64,14 @@ docker compose ps
 
 Open the frontend at <http://localhost:8080>. The API gateway is at <http://localhost:3000>. The backend service ports are also published for learning and troubleshooting. MongoDB is available on host port `27018` and retains data in the named `mongo-data` volume.
 
+Seed the database with 15 repeatable demo certificates (10 `VALID`, 5 `REVOKED`) without changing existing records:
+
+```powershell
+docker compose exec certificate-service npm run seed:demo
+```
+
+The seeder uses fixed `TG-DEMO-001` through `TG-DEMO-015` IDs and inserts only IDs that are not already present. Running it again does not duplicate or overwrite demo or user-created certificates. For Minikube, run `kubectl exec -n trustgrid deployment/certificate-service -- npm run seed:demo`.
+
 Stop the services but keep the database:
 
 ```powershell

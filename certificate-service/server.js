@@ -93,7 +93,7 @@ app.get("/certificates", async (req, res) => {
     try {
         await mongoose.connection.asPromise();
 
-        const certificates = await Certificate.find();
+        const certificates = await Certificate.find().sort({ _id: -1 });
         res.json(certificates);
     } catch (error) {
         res.status(500).json({
